@@ -13,9 +13,11 @@ var startCmd = &cobra.Command{
 	Short: "Start focusing",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg := config.GetConfig()
+
 		status := config.Status{
 			Type: config.TYPE_FOCUS,
-			End:  time.Now().Add(utils.GetDuration(args, time.Minute*25)),
+			End:  time.Now().Add(utils.GetDuration(args, cfg.Durations.Focus)),
 		}
 
 		config.WriteStatus(status)

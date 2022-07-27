@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
 var rootCmd = &cobra.Command{
 	Use:   "pomo",
 	Short: "Simple pomodoro timer",
@@ -23,16 +21,19 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
+		// Save IO ops by reading the config only if there is a running session
+		cfg := config.GetConfig()
+
 		// Print the remaining time
 		remaining := status.End.Sub(time.Now()).Round(time.Second)
-		fmt.Printf("%s %s\n", getEmoji(status, remaining), remaining)
+		fmt.Printf("%s %s\n", getEmoji(cfg, status, remaining), remaining)
 
 		// Notify the user when the remaining time has elapsed
 		if !status.Notified && remaining.Seconds() <= 0 {
 			if status.Type == config.TYPE_FOCUS {
-				utils.Alert("🥂", "Focus completed, let's take a break!", "Glass")
+				utils.Alert(cfg.Emojis.Break, "Focus completed, let's take a break!", cfg.Sound)
 			} else {
-				utils.Alert("🍅", "Break is over, back to work!", "Glass")
+				utils.Alert(cfg.Emojis.Focus, "Break is over, back to work!", cfg.Sound)
 			}
 
 			// Update the status to indicate the notification has been queued to
@@ -50,11 +51,7 @@ func Execute() {
 	}
 }
 
-func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_CONFIG_HOME/pomo/config.json)")
-}
-
-func getEmoji(status config.Status, remaining time.Duration) string {
+func getEmoji(cfg config.Config, status config.Status, remaining time.Duration) string {
 	// Blink the emoji when the pomodoro has finished
 	if remaining.Seconds() <= 0 {
 		if int(remaining.Seconds())%2 == 0 {
@@ -65,8 +62,8 @@ func getEmoji(status config.Status, remaining time.Duration) string {
 	}
 
 	if status.Type == config.TYPE_FOCUS {
-		return "🍅"
+		return cfg.Emojis.Focus
 	} else {
-		return "🥂"
+		return cfg.Emojis.Break
 	}
 }

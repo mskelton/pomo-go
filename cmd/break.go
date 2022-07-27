@@ -12,9 +12,11 @@ var breakCmd = &cobra.Command{
 	Use:   "break",
 	Short: "Start a break",
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg := config.GetConfig()
+
 		status := config.Status{
 			Type: config.TYPE_BREAK,
-			End:  time.Now().Add(utils.GetDuration(args, time.Minute*5)),
+			End:  time.Now().Add(utils.GetDuration(args, cfg.Durations.Break)),
 		}
 
 		config.WriteStatus(status)
