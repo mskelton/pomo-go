@@ -7,7 +7,7 @@ _Inspired by [rwxrob/pomo](https://github.com/rwxrob/pomo), but written from scr
 ## Installation
 
 ```bash
-go get github.com/mskelton/pomo
+go install github.com/mskelton/pomo@latest
 ```
 
 ## Usage
