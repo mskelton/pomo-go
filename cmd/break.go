@@ -13,8 +13,8 @@ var breakCmd = &cobra.Command{
 	Short: "Start a break",
 	Run: func(cmd *cobra.Command, args []string) {
 		status := config.Status{
-			End:     time.Now().Add(utils.GetDuration(args, time.Minute*5)),
-			IsFocus: false,
+			Type: config.TYPE_BREAK,
+			End:  time.Now().Add(utils.GetDuration(args, time.Minute*5)),
 		}
 
 		config.WriteStatus(status)

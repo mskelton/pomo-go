@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/mskelton/pomo/config"
+	"github.com/mskelton/pomo/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -17,14 +18,28 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		status := config.ReadStatus()
 
-		// Don't print anything if the end time is zero as that indicates there
-		// is no active session.
+		// Don't print anything if there is no active session
 		if status.End.IsZero() {
 			return
 		}
 
+		// Print the remaining time
 		remaining := status.End.Sub(time.Now()).Round(time.Second)
 		fmt.Printf("%s %s\n", getEmoji(status, remaining), remaining)
+
+		// Notify the user when the remaining time has elapsed
+		if !status.Notified && remaining.Seconds() <= 0 {
+			if status.Type == config.TYPE_FOCUS {
+				utils.Alert("🥂", "Focus completed, let's take a break!", "Glass")
+			} else {
+				utils.Alert("🍅", "Break is over, back to work!", "Glass")
+			}
+
+			// Update the status to indicate the notification has been queued to
+			// prevent duplicate notifications.
+			status.Notified = true
+			config.WriteStatus(status)
+		}
 	},
 }
 
@@ -49,7 +64,7 @@ func getEmoji(status config.Status, remaining time.Duration) string {
 		}
 	}
 
-	if status.IsFocus {
+	if status.Type == config.TYPE_FOCUS {
 		return "🍅"
 	} else {
 		return "🥂"

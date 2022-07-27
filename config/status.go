@@ -10,9 +10,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	TYPE_BREAK = iota
+	TYPE_FOCUS
+)
+
 type Status struct {
-	End     time.Time `json:"end"`
-	IsFocus bool      `json:"isFocus"`
+	Type     int       `json:"type"`
+	End      time.Time `json:"end"`
+	Notified bool      `json:"notified"`
 }
 
 func getStatusPath() string {

@@ -7,7 +7,7 @@ import (
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop the current session",
+	Short: "Stop the current pomodoro session",
 	Run: func(cmd *cobra.Command, args []string) {
 		config.WriteStatus(config.Status{})
 	},

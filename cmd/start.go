@@ -14,8 +14,8 @@ var startCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		status := config.Status{
-			End:     time.Now().Add(utils.GetDuration(args, time.Minute*25)),
-			IsFocus: true,
+			Type: config.TYPE_FOCUS,
+			End:  time.Now().Add(utils.GetDuration(args, time.Minute*25)),
 		}
 
 		config.WriteStatus(status)
