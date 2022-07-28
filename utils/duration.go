@@ -6,12 +6,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func GetDuration(args []string, fallback time.Duration) time.Duration {
+func GetDuration(args []string, cfg string) time.Duration {
 	if len(args) == 1 {
 		duration, err := time.ParseDuration(args[0])
 		cobra.CheckErr(err)
 		return duration
 	}
 
-	return fallback
+	duration, err := time.ParseDuration(cfg)
+	cobra.CheckErr(err)
+	return duration
 }

@@ -1,28 +1,27 @@
 package config
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"path"
-	"time"
 
+	"github.com/mskelton/pomo/utils"
 	"github.com/spf13/cobra"
 )
 
-type Durations struct {
-	Break time.Duration `json:"break"`
-	Focus time.Duration `json:"focus"`
+type durations struct {
+	Break string `json:"break"`
+	Focus string `json:"focus"`
 }
 
-type Emojis struct {
+type emojis struct {
 	Break string `json:"break"`
 	Focus string `json:"focus"`
 }
 
 type Config struct {
-	Durations Durations `json:"durations"`
-	Emojis    Emojis    `json:"emojis"`
+	Durations durations `json:"durations"`
+	Emojis    emojis    `json:"emojis"`
 	Sound     string    `json:"sound"`
 }
 
@@ -46,22 +45,12 @@ func WriteFile(name string, data []byte) {
 }
 
 func GetConfig() Config {
-	data, err := os.ReadFile(path.Join(GetConfigDir(), "config.json"))
 	cfg := Config{
-		Durations: Durations{Break: time.Minute * 5, Focus: time.Minute * 30},
-		Emojis:    Emojis{Break: "🥂", Focus: "🍅"},
+		Durations: durations{Break: "5m", Focus: "30m"},
+		Emojis:    emojis{Break: "🥂", Focus: "🍅"},
 		Sound:     "default",
 	}
 
-	// If the config file doesn't exist, just return the defaults
-	if errors.Is(err, os.ErrNotExist) {
-		return cfg
-	} else {
-		cobra.CheckErr(err)
-	}
-
-	err = json.Unmarshal(data, &cfg)
-	cobra.CheckErr(err)
-
+	utils.ReadJson(path.Join(GetConfigDir(), "config.json"), &cfg)
 	return cfg
 }
