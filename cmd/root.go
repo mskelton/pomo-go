@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"time"
 
@@ -52,13 +53,12 @@ func Execute() {
 }
 
 func getEmoji(cfg config.Config, status config.Status, remaining time.Duration) string {
-	// Blink the emoji when the pomodoro has finished
+	// Cycle through the warning emojis to make the timer "blink" when used in a
+	// statusline. This can be disabled by overriding the configuration to only
+	// provide a single emoji.
 	if remaining.Seconds() <= 0 {
-		if int(remaining.Seconds())%2 == 0 {
-			return "️🔴"
-		} else {
-			return "⭕"
-		}
+		index := int(math.Abs(remaining.Seconds())) % len(cfg.Emojis.Warn)
+		return cfg.Emojis.Warn[index]
 	}
 
 	if status.Type == config.TYPE_FOCUS {

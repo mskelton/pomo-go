@@ -15,8 +15,9 @@ type durations struct {
 }
 
 type emojis struct {
-	Break string `json:"break"`
-	Focus string `json:"focus"`
+	Break string   `json:"break"`
+	Focus string   `json:"focus"`
+	Warn  []string `json:"warn"`
 }
 
 type Config struct {
@@ -47,7 +48,7 @@ func WriteFile(name string, data []byte) {
 func GetConfig() Config {
 	cfg := Config{
 		Durations: durations{Break: "5m", Focus: "30m"},
-		Emojis:    emojis{Break: "🥂", Focus: "🍅"},
+		Emojis:    emojis{Break: "🥂", Focus: "🍅", Warn: []string{"🔴", "⭕"}},
 		Sound:     "default",
 	}
 

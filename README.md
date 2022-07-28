@@ -63,3 +63,22 @@ Stops the current pomodoro session.
 ```bash
 pomo stop
 ```
+
+## Config
+
+The default values for all commands can be customized by creating a `$HOME/.config/pomo/config.json` file. Below is an example of all available configuration options with their default values.
+
+```json
+{
+  "durations": {
+    "break": "5m",
+    "focus": "30m"
+  },
+  "emojis": {
+    "break": "🥂",
+    "focus": "🍅",
+    "warn": ["🔴", "⭕"]
+  },
+  "sound": "default"
+}
+```
