@@ -20,9 +20,13 @@ var breakCmd = &cobra.Command{
 		}
 
 		config.WriteStatus(status)
+		utils.CmdNotify(cmd, func() {
+			utils.Alert(cfg.Emojis.Break, "Your break has started!", cfg.Sound)
+		})
 	},
 }
 
 func init() {
+	breakCmd.Flags().Bool("notify", false, "display a push notification")
 	rootCmd.AddCommand(breakCmd)
 }
