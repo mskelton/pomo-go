@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var noEmoji = false
+
 var rootCmd = &cobra.Command{
 	Use:   "pomo",
 	Short: "Simple pomodoro timer",
@@ -27,7 +29,12 @@ var rootCmd = &cobra.Command{
 
 		// Print the remaining time
 		remaining := status.End.Sub(time.Now()).Round(time.Second)
-		fmt.Printf("%s %s\n", getEmoji(cfg, status, remaining), remaining)
+
+		if noEmoji {
+			fmt.Println(remaining)
+		} else {
+			fmt.Printf("%s %s\n", getEmoji(cfg, status, remaining), remaining)
+		}
 
 		// Notify the user when the remaining time has elapsed
 		if !status.Notified && remaining.Seconds() <= 0 {
@@ -50,6 +57,10 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.Flags().BoolVar(&noEmoji, "no-emoji", false, "disable emojis in the status")
 }
 
 func getEmoji(cfg config.Config, status config.Status, remaining time.Duration) string {
