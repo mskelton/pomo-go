@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -12,6 +13,7 @@ import (
 )
 
 var noEmoji = false
+var format string
 
 var rootCmd = &cobra.Command{
 	Use:   "pomo",
@@ -29,11 +31,13 @@ var rootCmd = &cobra.Command{
 
 		// Print the remaining time
 		remaining := status.End.Sub(time.Now()).Round(time.Second)
+		formatted, err := formatTime(format, remaining)
+		cobra.CheckErr(err)
 
 		if noEmoji {
-			fmt.Println(remaining)
+			fmt.Println(formatted)
 		} else {
-			fmt.Printf("%s %s\n", getEmoji(cfg, status, remaining), remaining)
+			fmt.Printf("%s %s\n", getEmoji(cfg, status, remaining), formatted)
 		}
 
 		// Notify the user when the remaining time has elapsed
@@ -61,6 +65,7 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolVar(&noEmoji, "no-emoji", false, "disable emojis in the status")
+	rootCmd.Flags().StringVar(&format, "format", "duration", "format style for the remaining time")
 }
 
 func getEmoji(cfg config.Config, status config.Status, remaining time.Duration) string {
@@ -77,4 +82,28 @@ func getEmoji(cfg config.Config, status config.Status, remaining time.Duration) 
 	} else {
 		return cfg.Emojis.Break
 	}
+}
+
+func formatTime(format string, duration time.Duration) (string, error) {
+	if format == "duration" {
+		return fmt.Sprintf("%s", duration), nil
+	}
+
+	if format == "time" {
+		// Display the format either as hh:mm:ss or mm:ss
+		layout := "15:04:05"
+		if duration.Hours() < 1 {
+			layout = "04:05"
+		}
+
+		// Format the time taking into account negative durations
+		base := time.Unix(0, 0).UTC()
+		if duration.Seconds() >= 0 {
+			return base.Add(duration).Format(layout), nil
+		} else {
+			return "-" + base.Add(duration.Abs()).Format(layout), nil
+		}
+	}
+
+	return "", errors.New("invalid format option")
 }
