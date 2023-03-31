@@ -97,17 +97,17 @@ func fmtDuration(duration time.Duration) string {
 	h := absolute / time.Hour
 	absolute -= h * time.Hour
 	m := absolute / time.Minute
-
-	// Don't display hours for durations less than an hour
-	if duration.Hours() < 1 {
-		absolute -= m * time.Minute
-		s := absolute / time.Second
-
-		return fmt.Sprintf("%s%dm%02ds", sign, m, s)
-	}
+	absolute -= m * time.Minute
+	s := absolute / time.Second
 
 	// Don't display seconds for durations greater than an hour
-	return fmt.Sprintf("%s%dh%02dm", sign, h, m)
+	if h >= 1 {
+		return fmt.Sprintf("%s%dh%02dm", sign, h, m)
+	} else if m >= 1 {
+		return fmt.Sprintf("%s%dm%02ds", sign, m, s)
+	} else {
+		return fmt.Sprintf("%s%ds", sign, s)
+	}
 }
 
 func formatTime(format string, duration time.Duration) (string, error) {
