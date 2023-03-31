@@ -84,9 +84,35 @@ func getEmoji(cfg config.Config, status config.Status, remaining time.Duration) 
 	}
 }
 
+func fmtDuration(duration time.Duration) string {
+	absolute := duration.Abs()
+	sign := ""
+
+	// Indicate if the time has fully expired
+	if math.Signbit(duration.Seconds()) {
+		sign = "-"
+	}
+
+	// Get the components of the duration
+	h := absolute / time.Hour
+	absolute -= h * time.Hour
+	m := absolute / time.Minute
+
+	// Don't display hours for durations less than an hour
+	if duration.Hours() < 1 {
+		absolute -= m * time.Minute
+		s := absolute / time.Second
+
+		return fmt.Sprintf("%s%dm%02ds", sign, m, s)
+	}
+
+	// Don't display seconds for durations greater than an hour
+	return fmt.Sprintf("%s%dh%02dm", sign, h, m)
+}
+
 func formatTime(format string, duration time.Duration) (string, error) {
 	if format == "duration" {
-		return fmt.Sprintf("%s", duration), nil
+		return fmtDuration(duration), nil
 	}
 
 	if format == "time" {
